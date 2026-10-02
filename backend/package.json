@@ -1,0 +1,25 @@
+{
+  "name": "periscope-backend",
+  "version": "3.4.0",
+  "description": "PERISCOPE backend: Firebase Auth verification + Supabase Storage/Postgres + local OCR",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "health": "node -e \"fetch('http://localhost:5000/api/health').then(r=>r.text()).then(console.log).catch(e=>{console.error(e.message);process.exit(1)})\""
+  },
+  "keywords": [],
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.4",
+    "express": "^5.2.1",
+    "firebase-admin": "^14.5.0",
+    "mammoth": "^1.13.0",
+    "multer": "^2.4.0",
+    "@supabase/supabase-js": "^2.57.4",
+    "scribe.js-ocr": "^0.16.1",
+    "pdf-parse": "^1.1.1"
+  }
+}

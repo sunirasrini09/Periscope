@@ -1,0 +1,12 @@
+{
+  "name": "periscope",
+  "version": "3.4.0",
+  "description": "PERISCOPE clinical records web app",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node backend/server.js",
+    "install:backend": "npm --prefix backend install",
+    "start:backend": "npm --prefix backend start"
+  },
+  "license": "ISC"
+}
