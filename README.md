@@ -1,97 +1,243 @@
-# PERISCOPE V3.2 — Firebase Auth + Supabase Storage/Postgres + Local OCR
+# PERISCOPE
 
-This cleaned build removes Firebase Firestore and Firebase Storage completely.
+## Introduction
+
+**PERISCOPE** is a web-based clinical records platform designed to organize patient information, clinical documents, investigations, treatment details, anaesthesia information, and Pre-Anaesthesia Check-up (PAC) workflows in a unified patient-centric interface.
+
+It combines **Firebase Authentication**, **Node.js/Express**, **Supabase PostgreSQL**, **Supabase Storage**, and local document extraction/OCR to support secure clinical-record workflows.
+
+> **Note:** Use synthetic/de-identified data for development and testing.
+
+---
 
 ## Architecture
-- Firebase Authentication: login/signup/password reset only.
-- Firebase Admin SDK: verifies the Firebase ID token on the PERISCOPE server.
-- Supabase Postgres: patients, profiles, documents metadata and audit logs.
-- Supabase Storage: private `periscope-documents` bucket for original files.
-- Scribe.js: local OCR/text extraction for PDFs and images; Mammoth for DOCX; plain text for TXT.
 
-## 1. Supabase setup
-You already created the private bucket `periscope-documents` and the required tables/`data` JSON column. **No additional Supabase setup is required for this build.**
-
-## 2. Firebase setup
-Firebase is AUTH ONLY. Enable Email/Password under Authentication → Sign-in method.
-Do not enable Firestore or Firebase Storage for this app.
-Keep your Firebase web config in `js/firebase-init.js`; it contains no storage/database connection.
-
-Download the Firebase Admin service-account JSON and place it at:
-`backend/serviceAccountKey.json`
-
-Never commit or upload that file.
-
-## 3. Backend environment
-Copy `backend/.env.example` to `backend/.env` and fill in:
-- `SUPABASE_URL`
-- `SUPABASE_SERVICE_ROLE_KEY`
-- `SUPABASE_STORAGE_BUCKET=periscope-documents`
-- Firebase service-account path if you are not using the JSON file method.
-
-Do NOT paste the service-role key into the frontend. It must stay in `backend/.env`.
-
-## 4. Install and run (Windows PowerShell)
-```powershell
-cd path\to\PERISCOPE_V3
-npm run install:backend
-npm start
+```text
+                    ┌──────────────────────┐
+                    │      PERISCOPE UI    │
+                    │ HTML / CSS / JS       │
+                    └──────────┬───────────┘
+                               │
+                         Firebase Auth
+                               │
+                               ▼
+                    ┌──────────────────────┐
+                    │ Node.js + Express    │
+                    │ Backend API          │
+                    └───────┬───────┬──────┘
+                            │       │
+              ┌─────────────┘       └──────────────┐
+              ▼                                    ▼
+     ┌─────────────────┐                  ┌─────────────────┐
+     │ Supabase        │                  │ Document        │
+     │ PostgreSQL      │                  │ Extraction/OCR  │
+     │ + Storage       │                  │ Local Processing│
+     └─────────────────┘                  └─────────────────┘
 ```
 
-Then open:
-`http://localhost:5000`
+### Technology Stack
 
-Do not use Live Server for the normal full-stack flow.
+- **Frontend:** HTML, CSS, JavaScript
+- **Backend:** Node.js, Express.js
+- **Authentication:** Firebase Authentication
+- **Database:** Supabase PostgreSQL
+- **File Storage:** Supabase Private Storage
+- **Document Processing:** PDF/DOCX extraction and local OCR
+- **Deployment:** GitHub + Render
 
-## 5. Verify
-Open `http://localhost:5000/api/health`.
-It should report Firebase Auth verification, Supabase and local OCR.
-Then sign in, create a patient and upload a PDF/DOCX/TXT/PNG/JPG.
+---
 
-## 6. Security notes
-- The Storage bucket must remain private.
-- The Supabase service-role key is server-side only.
-- Original files are stored under `users/<firebaseUid>/patients/<patientCode>/...`.
-- Downloads use short-lived signed URLs.
-- For development, use synthetic/de-identified records until your security, privacy and regulatory requirements are reviewed.
-- Scribe.js is AGPL-3.0; review its license before using this OCR component in a distributed/commercial product.
+## Core Functionalities
 
+### 1. Authentication & Roles
+- Firebase-based login
+- Role-based access
+- Doctor
+- Clinical Assistant
+- Admin
+- Anaesthesiologist
 
-## Document processing
+### 2. Patient Management
+- Add and edit patients
+- Patient-specific clinical records
+- Shared patient visibility across authorized clinical users
+- Patient overview and detailed clinical information
 
-Uploaded PDF/DOCX/TXT/PNG/JPG files are stored in the private Supabase bucket. Text-native PDFs are parsed locally first; scanned PDFs and images fall back to local Scribe.js OCR. The extracted text is saved in `documents.extracted_text`. PERISCOPE then rebuilds the patient clinical view from the uploaded records (timeline, anaesthesia, medications, investigations, conflicts, missing information and questions) and stores that structured view in `patients.data`.
+### 3. Clinical Record Management
+Patient records can include:
+- Basic details
+- Diagnosis and staging
+- Medical history
+- Medications
+- Investigations
+- Cancer treatment
+- Anaesthesia
+- Timeline
+- Missing information
+- Conflicts
+- Clinical questions
+- Clinical brief
+- Audit information
 
-Firebase is used only to authenticate the user and verify Firebase ID tokens on the backend. No Firestore or Firebase Storage is used.
+### 4. Document Management
+- Upload PDF, DOCX, JPG and PNG records
+- Document categorisation
+- OCR/text extraction
+- Patient-specific document association
+- Clinical information extraction and mapping
+- Persistent document records
 
+### 5. Custom Document Category
+Supports:
 
-## V3.3 document handling
-- Firebase is authentication only.
-- Supabase Storage stores private originals.
-- Supabase Postgres stores metadata and extracted text.
-- DOCX files are extracted with Mammoth.
-- Text PDFs are parsed with pdf-parse.
-- Scanned PDFs and images use local Scribe.js OCR.
-- Uploaded document text can be opened from the Documents tab.
-- No demo patients are included.
-- Keep `backend/.env` and `backend/serviceAccountKey.json` from your existing setup.
+```text
+Category: Other
+Specify Category: Clinical Summary
+```
 
+The specified category is persisted with the document.
 
-## V3.4 upload interaction fix
-The document picker now captures selected files immediately, validates PDF/DOCX/TXT/PNG/JPG/JPEG and 50 MB size, renders the queued file, and prevents duplicate queue entries. Browser cache is busted for app.js.
+### 6. PAC Workflow
+- Multi-section PAC form
+- Direct section navigation
+- Save Draft
+- Save & Continue
+- Persistent PAC data
+- Mark as Reviewed
+- Submit / Return / Finalize workflow
+- PAC data stored with the patient record
 
+### 7. Clinical Information Mapping
+Extracted information can be mapped into relevant patient sections, including:
+- Age and sex
+- Diagnosis
+- Comorbidities
+- Medications
+- Investigations
+- Cancer treatment
+- Planned procedure
+- Anaesthesia information
 
-## V3.7 UX and PDF fallback
-- The left sidebar is now global only: Dashboard, Patients, Add Patient, Profile (plus Admin tools). Patient clinical sections live once, inside the selected patient's workspace tabs.
-- Patient quick actions are reduced to Edit Patient, Upload Records and Generate Brief to avoid duplicate navigation.
-- PDF files with malformed/non-standard XRef tables use local OCR fallback; the terminal reports this as an informational fallback rather than an extraction failure when OCR succeeds.
-- Added `Clinical Summary` as a document category.
+The system is designed to map only information supported by the uploaded document.
 
+### 8. Audit & Traceability
+- Patient-specific records
+- Document activity
+- Clinical workflow status
+- Audit logging
 
-## V3.8 shared patients and role handling
-- Firebase Authentication remains login/authentication only.
-- Doctor and Clinical Assistant accounts can see the shared patient list.
-- Clinical Assistants can add and edit patient information and upload records.
-- Patient deletion remains restricted to Doctor/Admin.
-- Patient documents, derived clinical views and audit history are shared for the patient.
-- Admin is provisioned manually rather than through public signup.
-- Login no longer trusts a role selected by the user; the role is read from the Supabase `profiles` record.
+---
+
+## Data Flow
+
+```text
+User
+ ↓
+Firebase Login
+ ↓
+PERISCOPE Clinical UI
+ ↓
+Node.js / Express API
+ ↓
+Supabase PostgreSQL / Storage
+ ↓
+Document Extraction / OCR
+ ↓
+Clinical Information Mapping
+ ↓
+User Review
+ ↓
+Persistent Patient Record
+```
+
+---
+
+## Data & Security
+
+- Firebase is used for authentication.
+- Supabase PostgreSQL stores application data.
+- Supabase Storage stores clinical documents.
+- Storage buckets should remain private.
+- Firebase service-account credentials must remain server-side.
+- Supabase service-role keys must never be exposed in frontend code.
+- `.env`, service-account files and `node_modules` must not be committed to GitHub.
+
+Recommended `.gitignore`:
+
+```text
+.env
+serviceAccountKey.json
+node_modules/
+```
+
+---
+
+## Example Test Workflow
+
+A synthetic patient such as **Kamali Devi** can be used to test:
+
+```text
+Upload clinical document
+        ↓
+Select "Other"
+        ↓
+Specify "Clinical Summary"
+        ↓
+Process / OCR
+        ↓
+Extract clinical information
+        ↓
+Map to patient record
+        ↓
+Review PAC
+        ↓
+Save and persist
+```
+
+---
+
+## Deployment
+
+The application can be deployed using:
+
+```text
+GitHub
+   ↓
+Render
+   ↓
+Node.js / Express
+   ↓
+Supabase + Firebase
+```
+
+Environment-specific secrets should be configured through the hosting platform rather than committed to the repository.
+
+---
+
+## Project Structure
+
+```text
+PERISCOPE/
+├── index.html
+├── css/
+├── js/
+├── assets/
+├── backend/
+│   ├── server.js
+│   ├── package.json
+│   └── ...
+├── .gitignore
+└── README.md
+```
+
+---
+
+## Status
+
+PERISCOPE is under active development. Features and workflows may evolve as clinical-record extraction, PAC workflows, validation, and deployment are refined.
+
+---
+
+## Disclaimer
+
+PERISCOPE is a software project for clinical-record organization and workflow demonstration. It should not be used with real patient information or for clinical decision-making without appropriate security, validation, privacy, regulatory, and clinical review.
