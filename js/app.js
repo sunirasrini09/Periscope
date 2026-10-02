@@ -613,7 +613,7 @@ fin:async()=>{const e=chk('final');if(e.length)return show(e);const o=[st,done];
 reopen:async()=>{const why=prompt('Reason for reopening (required):');if(!why)return;const o=[st,done];L('Workflow','Reopen','Completed',why);done=false;st='Under Anaesthesiologist Review';const r=await persist('reopen');if(r.ok)show(null,'PAC reopened and saved.');else{st=o[0];done=o[1];fail('PAC not reopened',r)}}}})();
 
 /* ===================== PERISCOPE BACKEND / FIREBASE DATA LAYER ===================== */
-const PERISCOPE_API_URL = localStorage.getItem('periscope_api_url') || ((location.hostname === 'localhost' || location.hostname === '127.0.0.1') && location.port !== '5500' ? location.origin : 'http://localhost:5000');
+const PERISCOPE_API_URL = localStorage.getItem('periscope_api_url') || location.origin;
 let apiLoaded = false;
 let saveTimer = null;
 let saveInFlight = false;
