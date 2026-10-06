@@ -237,6 +237,11 @@ PERISCOPE/
 PERISCOPE is under active development. Features and workflows may evolve as clinical-record extraction, PAC workflows, validation, and deployment are refined.
 
 ---
+## Contributors
+
+- [Harini S](https://github.com/Harini0904-ece)
+
+---
 
 ## Disclaimer
 
