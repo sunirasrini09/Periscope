@@ -247,15 +247,16 @@ PeriScope is intended to assist with medical record organization and pre-anaesth
 
 ## 13. Project Team
 
-**Team Leader & Technical Lead**
+**Technical Development Team**
 - Mr. Shyamkumar M
+- Ms. Radhika S
+- Ms. Harini S
+
 
 **Doctor Partner & Clinical Mentor**
 - Dr. Preethi Reddy – Anaesthesiologist
 
-**Technical Development Team**
-- Ms. Radhika S
-- Ms. Harini S
+
 
 ## 14. Acknowledgement
 
